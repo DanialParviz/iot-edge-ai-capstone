@@ -1,5 +1,18 @@
-# Extra packages needed only on the Raspberry Pi 5 (real sensors and GPIO).
+# Extra packages needed only on the Raspberry Pi 5 (real sensors, GPIO, camera, AI).
 -r requirements.txt
 gpiozero
 adafruit-circuitpython-vl53l0x
 adafruit-circuitpython-bme680
+
+# Cloud
+awsiotsdk
+
+# Vision / TinyML
+mediapipe
+opencv-python
+# picamera2 is installed with apt on Raspberry Pi OS:  sudo apt install python3-picamera2
+# Create the venv with --system-site-packages so it can import picamera2.
+
+# Face recognition (EdgeFace XS)
+torch
+timm

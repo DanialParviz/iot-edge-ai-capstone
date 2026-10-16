@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional, Protocol
 
 from ml.agent.stats import label_counts, numeric_summary
+from ml.summary import collect_stats
 
 SENSORS = ("distance", "temperature", "vision")
 LEDS = ("red", "yellow", "green")
@@ -108,15 +109,14 @@ def build_registry(stores: dict[str, Any], actuator: Optional[ActuatorPort] = No
             return {"sensor": sensor, "distance_cm": numeric_summary(records, "distance_cm")}
         if sensor == "temperature":
             return {"sensor": sensor, "temperature_c": numeric_summary(records, "temperature_c")}
-        return {"sensor": sensor, "object_counts": label_counts(records, "object")}
+        return {
+            "sensor": sensor,
+            "object_counts": label_counts(records, "object"),
+            "face_counts": label_counts(records, "identity"),
+        }
 
     def get_system_summary(n: int = 10):
-        n = _check_n(n)
-        return {
-            "distance_cm": numeric_summary(stores["distance"].latest(n), "distance_cm"),
-            "temperature_c": numeric_summary(stores["temperature"].latest(n), "temperature_c"),
-            "object_counts": label_counts(stores["vision"].latest(n), "object"),
-        }
+        return collect_stats(stores, _check_n(n))
 
     def set_led(led: str, on: bool):
         if led not in LEDS:

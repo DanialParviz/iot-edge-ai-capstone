@@ -42,3 +42,9 @@ logs/
 
 # Local sensor databases
 data/local-db/
+
+# Models, outbox and local data (never commit)
+*.gguf
+Models/
+*.sqlite
+*.onnx

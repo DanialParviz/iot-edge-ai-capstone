@@ -73,3 +73,11 @@ class AlertTracker:
         was_on = self._state[decision.led]
         self._state[decision.led] = decision.on
         return decision.on and not was_on
+
+
+@dataclass(frozen=True)
+class Alert:
+    """A new OFF -> ON event that should be announced (Discord, AWS)."""
+
+    led: str
+    reason: str

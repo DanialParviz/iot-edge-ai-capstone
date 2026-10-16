@@ -57,7 +57,7 @@ def test_vision_stats_counts_objects(stores):
 
 def test_system_summary_covers_all_sensors(stores):
     out = json.loads(build_registry(stores).call("get_system_summary", {}))
-    assert set(out) == {"distance_cm", "temperature_c", "object_counts"}
+    assert set(out) == {"distance_cm", "temperature_c", "object_counts", "face_counts"}
     assert out["temperature_c"]["max"] == 30.9
 
 

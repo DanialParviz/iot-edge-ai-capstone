@@ -7,6 +7,8 @@ its own file.
 
 from __future__ import annotations
 
+import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +32,14 @@ class SensorStore:
         """Return the newest ``n`` records, oldest first."""
         if n <= 0:
             return []
-        records = self._db.all()
+        for attempt in range(3):
+            try:
+                records = self._db.all()
+                break
+            except json.JSONDecodeError:  # another process was mid-write
+                if attempt == 2:
+                    raise
+                time.sleep(0.05)
         return [dict(r) for r in records[-n:]]
 
     def count(self) -> int:

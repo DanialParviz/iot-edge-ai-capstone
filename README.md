@@ -61,23 +61,35 @@ LED pins and the broker address are environment variables; see `edge/config.py`.
 
 ## What's Implemented
 
-| Area | Code | Notes |
+| Area | Code | Status |
 |---|---|---|
-| Config, thresholds, topics | `edge/config.py` | Env-overridable, no secrets |
-| Per-sensor storage | `edge/storage.py` | One TinyDB file per source, avoids write collisions |
-| LED decision rules | `edge/rules.py` | Pure functions; alerts fire only on OFF→ON |
-| LEDs | `edge/actuators.py` | GPIO (`gpiozero`) or fake for laptops |
-| Sensors | `edge/sensors/` | VL53L0X, BME680, plus simulated versions |
-| Local MQTT | `edge/messaging.py` | paho-mqtt wrapper for Mosquitto |
-| Edge loop | `edge/main.py` | read → store → publish → rules → LEDs |
-| Agent tools | `ml/agent/tools.py` | Approved-tool registry; `set_led` is dry-run by default |
-| Deterministic stats | `ml/agent/stats.py` | Python does all counting/math; the model only writes text |
-| Agent loop + LLM client | `ml/agent/agent.py`, `llm.py` | llama.cpp server client (not yet run on the Pi) |
+| Config, thresholds, topics | `edge/config.py` | tested |
+| Per-sensor storage (TinyDB) | `edge/storage.py` | tested |
+| LED rules, edge-triggered alerts | `edge/rules.py` | tested |
+| LED controller (sole GPIO owner) + `command/led` | `edge/actuator_controller.py` | tested |
+| LEDs (GPIO or fake) | `edge/actuators.py` | fake tested; GPIO needs the Pi |
+| Discord alerts | `edge/alerts.py` | tested with a mocked network |
+| Distance + temperature sensors | `edge/sensors/`, `edge/main.py` | logic tested; drivers need the Pi |
+| Local MQTT + fan-out publishing | `edge/messaging.py` | payload logic tested; broker needs Mosquitto |
+| AWS IoT Core transport | `edge/aws_iot.py` | needs verifying on the Pi |
+| **Offline outbox** (no data lost, ordered, de-duplicable) | `edge/offline_queue.py` | tested |
+| Camera: objects (EfficientDet-Lite0) + faces (YuNet/EdgeFace) | `edge/vision/` | matching/records tested; models need the Pi |
+| One-command launcher, clean Ctrl+C | `edge/launcher.py` | tested |
+| Deterministic stats | `ml/agent/stats.py` | tested |
+| Checked 4-line summary (Distance/Temperature/Vision/Faces) | `ml/summary.py`, `ml/combined.py` | tested |
+| Tool-calling agent (approved tools only) | `ml/agent/` | loop tested with a scripted model |
+| Model benchmark (Qwen vs IBM Granite) | `ml/benchmark_slm.py` | harness tested; run it on the Pi |
 
-**Not yet done:** camera/TinyML detection, face recognition, AWS IoT Core publishing,
-offline sync queue, and testing the agent against the Pi's local model.
-The VL53L0X/BME680/GPIO drivers and the llama.cpp client are written but have not been run
-on real hardware yet.
+Run `pytest` for the unit tests. Anything marked "needs the Pi" was written to the project's
+documented setup but has not been run on the real hardware from this repo yet. The checklist
+for doing that, and the measurements for the poster, is in [`docs/test-plan.md`](docs/test-plan.md).
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md): data flow, design rules, topics, environment variables
+- [`docs/test-plan.md`](docs/test-plan.md): on-Pi verification and measurements
+- [`docs/demo.md`](docs/demo.md): live demo script
+- [`docs/poster-outline.md`](docs/poster-outline.md): poster layout
 
 ## Status
 

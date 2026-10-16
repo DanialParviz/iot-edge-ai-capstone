@@ -51,9 +51,35 @@ class LocalBroker:
                 return
             handler(msg.topic, data)
 
-        self._client.on_message = on_message
+        # One callback per topic filter, so several subscriptions can coexist.
+        self._client.message_callback_add(topic, on_message)
         self._client.subscribe(topic, qos=1)
 
     def close(self) -> None:
         self._client.loop_stop()
         self._client.disconnect()
+
+
+class FanoutPublisher:
+    """Publish to several targets (e.g. local Mosquitto and AWS).
+
+    One target failing never stops the others, so local control keeps working
+    when the cloud is unreachable.
+    """
+
+    def __init__(self, targets) -> None:
+        self.targets = list(targets)
+
+    def publish(self, topic: str, payload: dict[str, Any]) -> None:
+        for target in self.targets:
+            try:
+                target.publish(topic, payload)
+            except Exception:
+                log.exception("publish to %s failed", type(target).__name__)
+
+    def close(self) -> None:
+        for target in self.targets:
+            try:
+                target.close()
+            except Exception:
+                log.exception("closing %s failed", type(target).__name__)
