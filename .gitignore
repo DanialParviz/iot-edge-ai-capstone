@@ -39,3 +39,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Local sensor databases
+data/local-db/

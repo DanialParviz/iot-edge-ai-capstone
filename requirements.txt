@@ -1,0 +1,6 @@
+# Runs on a laptop (use --simulate) and on the Pi.
+tinydb>=4.8
+paho-mqtt>=2.0
+
+# Tests
+pytest>=8.0

@@ -1,0 +1,5 @@
+# Extra packages needed only on the Raspberry Pi 5 (real sensors and GPIO).
+-r requirements.txt
+gpiozero
+adafruit-circuitpython-vl53l0x
+adafruit-circuitpython-bme680
